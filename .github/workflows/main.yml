@@ -3,7 +3,7 @@ name: GitHub Pages CI
 on:
   push:
     branches:
-      - main  # Modify this branch name according to your repository's branch setup
+      - main 
 
 jobs:
   build-and-deploy:
@@ -13,8 +13,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v1
+
       - name: Install pkgdown
-        run: Rscript -e "install.packages('pkgdown')"
+        run: Rscript -e "install.packages('pkgdown', lib = '~/R')"
 
       - name: Build site with pkgdown
         run: Rscript -e "pkgdown::build_site()"
@@ -23,4 +26,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs  # Modify this directory according to your pkgdown setup
+          publish_dir: ./docs
