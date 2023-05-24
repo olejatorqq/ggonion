@@ -3,7 +3,7 @@ name: GitHub Pages CI
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   build-and-deploy:
@@ -17,7 +17,9 @@ jobs:
         uses: r-lib/actions/setup-r@v1
 
       - name: Install pkgdown
-        run: Rscript -e "install.packages('pkgdown', lib = '~/R')"
+        run: |
+          sudo apt-get install -y pandoc
+          Rscript -e "install.packages('pkgdown', repos = 'https://cloud.r-project.org/')"
 
       - name: Build site with pkgdown
         run: Rscript -e "pkgdown::build_site()"
