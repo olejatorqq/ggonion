@@ -1,31 +1,26 @@
-name: GitHub Pages
+name: GitHub Pages CI
 
 on:
   push:
     branches:
-      - main
+      - main  # Modify this branch name according to your repository's branch setup
 
 jobs:
-  build-deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up R
-      uses: r-lib/actions/setup-r@v1
+      - name: Install pkgdown
+        run: Rscript -e "install.packages('pkgdown')"
 
-    - name: Install dependencies
-      run: |
-        R -e "install.packages('remotes')"
-        R -e "remotes::install_github('r-lib/pkgdown')"
+      - name: Build site with pkgdown
+        run: Rscript -e "pkgdown::build_site()"
 
-    - name: Build site
-      run: R -e "pkgdown::build_site()"
-
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        personal_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs  # Modify this directory according to your pkgdown setup
