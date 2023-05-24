@@ -1,27 +1,26 @@
-name: GitHub Pages CI
+name: Build and Deploy Site
 
 on:
   push:
     branches:
-      - main 
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Docker
-        uses: docker/setup-docker@v1
-
-      - name: Build site with pkgdown
+      - name: Install dependencies
         run: |
-          docker run --rm -v ${{ github.workspace }}:/app -w /app rocker/r-ver:4.1.2 Rscript -e "install.packages('pkgdown', repos = 'https://cloud.r-project.org/')"
-          docker run --rm -v ${{ github.workspace }}:/app -w /app rocker/r-ver:4.1.2 Rscript -e "pkgdown::build_site()"
+          Rscript -e 'install.packages("devtools")'
+          Rscript -e 'devtools::install_deps()'
 
-      - name: Deploy to GitHub Pages
+      - name: Build site
+        run: Rscript -e 'pkgdown::build_site(path = "docs")'
+
+      - name: Deploy to GH Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
