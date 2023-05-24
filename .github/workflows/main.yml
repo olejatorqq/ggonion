@@ -1,4 +1,4 @@
-name: Build and Deploy Site
+name: Build and Deploy pkgdown Site
 
 on:
   push:
@@ -8,20 +8,26 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: |
-          Rscript -e 'install.packages("devtools")'
-          Rscript -e 'devtools::install_deps()'
+    - name: Setup R
+      uses: r-lib/actions/setup-r@v1
 
-      - name: Build site
-        run: Rscript -e 'pkgdown::build_site(path = "docs")'
+    - name: Install dependencies
+      run: |
+        install.packages("remotes")
+        remotes::install_deps(dependencies = TRUE)
+        remotes::install_github("r-lib/pkgdown")
 
-      - name: Deploy to GH Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+    - name: Build pkgdown site
+      run: |
+        pkgdown::build_site()
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs
